@@ -5,7 +5,7 @@ import (
 )
 
 type Book struct {
-	ID       uuid.UUID
-	AuthorID uuid.UUID
-	Title    string
+	ID        uuid.UUID
+	Title     string
+	AuthorIDs []uuid.UUID
 }

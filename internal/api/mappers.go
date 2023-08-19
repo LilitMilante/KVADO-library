@@ -3,6 +3,8 @@ package api
 import (
 	"KVADO-library/gen/proto"
 	"KVADO-library/internal/entity"
+
+	"github.com/google/uuid"
 )
 
 func BooksByAuthorResponse(books []entity.Book) *proto.BooksByAuthorResponse {
@@ -13,10 +15,19 @@ func BooksByAuthorResponse(books []entity.Book) *proto.BooksByAuthorResponse {
 
 func bookToAPI(book entity.Book) *proto.Book {
 	return &proto.Book{
-		Id:       book.ID.String(),
-		AuthorId: book.AuthorID.String(),
-		Title:    book.Title,
+		Id:        book.ID.String(),
+		Title:     book.Title,
+		AuthorIds: authorIDsToAPI(book.AuthorIDs),
 	}
+}
+
+func authorIDsToAPI(authorIDs []uuid.UUID) []string {
+	strID := make([]string, 0, len(authorIDs))
+	for _, v := range authorIDs {
+		strID = append(strID, v.String())
+	}
+
+	return strID
 }
 
 func booksToAPI(books []entity.Book) []*proto.Book {

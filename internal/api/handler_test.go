@@ -11,7 +11,6 @@ import (
 	"KVADO-library/internal/app"
 	"KVADO-library/internal/repository"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -20,10 +19,22 @@ import (
 func TestHandler_BooksByAuthor(t *testing.T) {
 	client := NewClient(t)
 
-	_, err := client.BooksByAuthor(context.Background(), &proto.BooksByAuthorRequest{
-		AuthorId: uuid.NewString(),
+	// Lev Tolstoi ID
+	authorID := "44a54d7b-6289-4b12-b030-1ffd884763cb"
+	expBookCount := 4
+
+	resp, err := client.BooksByAuthor(context.Background(), &proto.BooksByAuthorRequest{
+		AuthorId: authorID,
 	})
 	require.NoError(t, err)
+
+	require.Len(t, resp.Books, expBookCount) // check expected book count
+
+	for _, v := range resp.Books {
+		require.NotEmpty(t, v.Id)                  // check id is not empty
+		require.NotEmpty(t, v.Title)               // check title is not empty
+		require.Contains(t, v.AuthorIds, authorID) // check authorIDs contains authorID
+	}
 }
 
 func NewClient(t *testing.T) proto.LibraryClient {
@@ -58,14 +69,9 @@ func NewClient(t *testing.T) proto.LibraryClient {
 func initDB(t *testing.T) *sql.DB {
 	t.Helper()
 
-	db, err := app.ConnectToMySQL("root:dev@tcp(localhost:3306)/library")
+	db, err := app.ConnectToMySQL("root:dev@tcp(localhost:3306)/library?multiStatements=true")
 	require.NoError(t, err)
 	t.Cleanup(func() {
-		_, err := db.Exec("TRUNCATE TABLE books;")
-		require.NoError(t, err)
-		_, err = db.Exec("TRUNCATE TABLE authors;")
-		require.NoError(t, err)
-
 		require.NoError(t, db.Close())
 	})
 

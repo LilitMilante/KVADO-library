@@ -34,7 +34,7 @@ func upMigrations(db *sql.DB) error {
 	goose.SetBaseFS(migrations.FS)
 	goose.SetLogger(goose.NopLogger())
 
-	err := goose.SetDialect("postgres")
+	err := goose.SetDialect("mysql")
 	if err != nil {
 		return err
 	}

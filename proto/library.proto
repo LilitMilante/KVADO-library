@@ -10,8 +10,8 @@ service Library {
 
 message Book {
   string id = 1;
-  string author_id = 2;
-  string title = 3;
+  string title = 2;
+  repeated string author_ids = 3;
 }
 
 message Author {

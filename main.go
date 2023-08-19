@@ -8,6 +8,7 @@ import (
 	"KVADO-library/internal/api"
 	"KVADO-library/internal/app"
 	"KVADO-library/internal/repository"
+	"KVADO-library/internal/service"
 )
 
 func main() {
@@ -20,14 +21,20 @@ func main() {
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	defer lis.Close()
+	defer func() {
+		err := lis.Close()
+		if err != nil {
+			log.Printf("close listener: %s/n", err)
+		}
+	}()
 
 	db, err := app.ConnectToMySQL(cfg.MySQLdsn)
 	if err != nil {
 		log.Panicf("connect to database: %s", err)
 	}
 	repo := repository.NewRepository(db)
-	h := api.NewHandler(repo)
+	s := service.NewBookService(repo)
+	h := api.NewHandler(s)
 	srv := api.NewServer(h)
 	err = srv.Serve(lis)
 	if err != nil {
