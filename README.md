@@ -1,12 +1,22 @@
 ## Start the application with database:
 `make up-docker`
 
+## Install dependencies:
+```bash
+make deps
+```
+
+
 ## How to send requests
 ### Get books by author ID:
-`make sand-1 `
+```bash
+make sand-1
+```
 
 ### Get authors by book ID:
-`make send-2`
+```bash
+make send-2
+```
 
 # You can use next data examples
 
