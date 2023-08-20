@@ -3,7 +3,6 @@ package api
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net"
 	"testing"
 
@@ -60,7 +59,9 @@ func TestHandler_AuthorsByBookID(t *testing.T) {
 func NewClient(t *testing.T) proto.LibraryClient {
 	t.Helper()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 8091))
+	addr := "localhost:8091"
+
+	lis, err := net.Listen("tcp", addr)
 	require.NoError(t, err)
 
 	db := initDB(t)
@@ -74,7 +75,7 @@ func NewClient(t *testing.T) proto.LibraryClient {
 		require.NoError(t, err)
 	}()
 
-	conn, err := grpc.Dial("localhost:8091", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		err := conn.Close()
@@ -90,7 +91,7 @@ func NewClient(t *testing.T) proto.LibraryClient {
 func initDB(t *testing.T) *sql.DB {
 	t.Helper()
 
-	db, err := app.ConnectToMySQL("root:dev@tcp(localhost:3306)/library?multiStatements=true")
+	db, err := app.ConnectToMySQL("root:dev@tcp(localhost:13306)/library?multiStatements=true")
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		require.NoError(t, db.Close())
