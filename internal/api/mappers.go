@@ -7,7 +7,9 @@ import (
 	"github.com/google/uuid"
 )
 
-func BooksByAuthorResponse(books []entity.Book) *proto.BooksByAuthorResponse {
+// Mappers for books
+
+func BooksByAuthorIDResponse(books []entity.Book) *proto.BooksByAuthorResponse {
 	return &proto.BooksByAuthorResponse{
 		Books: booksToAPI(books),
 	}
@@ -38,4 +40,30 @@ func booksToAPI(books []entity.Book) []*proto.Book {
 	}
 
 	return apiBooks
+}
+
+// Mappers for authors
+
+func AuthorsByBookIDResponse(authors []entity.Author) *proto.AuthorsByBookResponse {
+	return &proto.AuthorsByBookResponse{
+		Authors: authorsToAPI(authors),
+	}
+}
+
+func authorToAPI(author entity.Author) *proto.Author {
+	return &proto.Author{
+		Id:        author.ID.String(),
+		FirstName: author.FirstName,
+		LastName:  author.LastName,
+	}
+}
+
+func authorsToAPI(authors []entity.Author) []*proto.Author {
+	apiAuthors := make([]*proto.Author, 0, len(authors))
+
+	for _, v := range authors {
+		apiAuthors = append(apiAuthors, authorToAPI(v))
+	}
+
+	return apiAuthors
 }

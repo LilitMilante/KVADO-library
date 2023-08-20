@@ -19,7 +19,7 @@ func NewRepository(db *sql.DB) *Repository {
 	return &Repository{db: db}
 }
 
-func (r *Repository) BooksByAuthor(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error) {
+func (r *Repository) BooksByAuthorID(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error) {
 	q := `SELECT id, title FROM books
     	  JOIN authors_books ON books.id = authors_books.book_id
     	  WHERE authors_books.author_id = ?`
@@ -95,4 +95,31 @@ func (r *Repository) booksAuthorIDs(ctx context.Context, books []entity.Book) (m
 	}
 
 	return bookAuthors, nil
+}
+
+func (r *Repository) AuthorsByBookID(ctx context.Context, bookID uuid.UUID) ([]entity.Author, error) {
+	q := `SELECT id, first_name, last_name FROM authors
+    	  JOIN authors_books ON authors.id = authors_books.author_id
+    	  WHERE authors_books.book_id = ?`
+
+	rows, err := r.db.QueryContext(ctx, q, bookID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var authors []entity.Author
+
+	for rows.Next() {
+		var author entity.Author
+
+		err := rows.Scan(&author.ID, &author.FirstName, &author.LastName)
+		if err != nil {
+			return nil, err
+		}
+
+		authors = append(authors, author)
+	}
+
+	return authors, nil
 }

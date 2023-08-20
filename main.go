@@ -17,7 +17,9 @@ func main() {
 		log.Fatalf("init config: %s", err)
 	}
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", cfg.GRPCPort))
+	log.Printf("listen port: %d", cfg.GRPCPort)
+
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.GRPCPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -33,7 +35,7 @@ func main() {
 		log.Panicf("connect to database: %s", err)
 	}
 	repo := repository.NewRepository(db)
-	s := service.NewBookService(repo)
+	s := service.NewService(repo)
 	h := api.NewHandler(s)
 	srv := api.NewServer(h)
 	err = srv.Serve(lis)

@@ -5,7 +5,8 @@ package proto;
 option go_package = "KVADO-library/gen/proto";
 
 service Library {
-  rpc BooksByAuthor(BooksByAuthorRequest) returns (BooksByAuthorResponse) {}
+  rpc BooksByAuthorID(BooksByAuthorRequest) returns (BooksByAuthorResponse) {}
+  rpc AuthorsByBookID(AuthorsByBookRequest) returns (AuthorsByBookResponse) {}
 }
 
 message Book {
@@ -26,4 +27,12 @@ message BooksByAuthorRequest {
 
 message BooksByAuthorResponse {
   repeated Book books = 1;
+}
+
+message AuthorsByBookRequest {
+  string book_id = 1;
+}
+
+message AuthorsByBookResponse {
+  repeated Author authors = 1;
 }

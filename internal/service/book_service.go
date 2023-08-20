@@ -9,17 +9,28 @@ import (
 )
 
 type Repository interface {
-	BooksByAuthor(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error)
+	BooksByAuthorID(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error)
+	AuthorsByBookID(ctx context.Context, bookID uuid.UUID) ([]entity.Author, error)
 }
 
-type BookService struct {
+type Service struct {
 	repo Repository
 }
 
-func NewBookService(repo Repository) *BookService {
-	return &BookService{repo: repo}
+// create new service
+
+func NewService(repo Repository) *Service {
+	return &Service{repo: repo}
 }
 
-func (b *BookService) BooksByAuthor(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error) {
-	return b.repo.BooksByAuthor(ctx, authorID)
+// get all books by author ID
+
+func (s *Service) BooksByAuthorID(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error) {
+	return s.repo.BooksByAuthorID(ctx, authorID)
+}
+
+// get all authors by book ID
+
+func (s *Service) AuthorsByBookID(ctx context.Context, bookID uuid.UUID) ([]entity.Author, error) {
+	return s.repo.AuthorsByBookID(ctx, bookID)
 }

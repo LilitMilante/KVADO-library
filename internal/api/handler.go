@@ -10,7 +10,8 @@ import (
 )
 
 type Service interface {
-	BooksByAuthor(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error)
+	BooksByAuthorID(ctx context.Context, authorID uuid.UUID) ([]entity.Book, error)
+	AuthorsByBookID(ctx context.Context, bookID uuid.UUID) ([]entity.Author, error)
 }
 
 type Handler struct {
@@ -25,16 +26,34 @@ func NewHandler(srv Service) *Handler {
 	}
 }
 
-func (h *Handler) BooksByAuthor(ctx context.Context, r *proto.BooksByAuthorRequest) (*proto.BooksByAuthorResponse, error) {
-	authorID, err := uuid.Parse(r.AuthorId)
+// Get list books by author ID
+
+func (h *Handler) BooksByAuthorID(ctx context.Context, r *proto.BooksByAuthorRequest) (*proto.BooksByAuthorResponse, error) {
+	authorID, err := uuid.Parse(r.AuthorId) // parse string ID to UUID
 	if err != nil {
 		return nil, err
 	}
 
-	books, err := h.srv.BooksByAuthor(ctx, authorID)
+	books, err := h.srv.BooksByAuthorID(ctx, authorID)
 	if err != nil {
 		return nil, err
 	}
 
-	return BooksByAuthorResponse(books), nil
+	return BooksByAuthorIDResponse(books), nil
+}
+
+// Get list authors by book ID
+
+func (h *Handler) AuthorsByBookID(ctx context.Context, r *proto.AuthorsByBookRequest) (*proto.AuthorsByBookResponse, error) {
+	bookID, err := uuid.Parse(r.BookId) // parse string ID to UUID
+	if err != nil {
+		return nil, err
+	}
+
+	authors, err := h.srv.AuthorsByBookID(ctx, bookID)
+	if err != nil {
+		return nil, err
+	}
+
+	return AuthorsByBookIDResponse(authors), nil
 }

@@ -1,0 +1,31 @@
+version: "3.9"
+
+networks:
+  library:
+
+services:
+  db:
+    container_name: library-db
+    image: mysql:8.1.0
+    environment:
+      MYSQL_ROOT_PASSWORD: dev
+      MYSQL_DATABASE: library
+    ports:
+      - "3306:3306"
+    networks:
+      - library
+    restart: always
+
+  app:
+    container_name: library-app
+    build: .
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    networks:
+      - library
+    depends_on:
+      - db
+    restart: always
+    pull_policy: always

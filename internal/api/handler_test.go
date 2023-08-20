@@ -19,11 +19,10 @@ import (
 func TestHandler_BooksByAuthor(t *testing.T) {
 	client := NewClient(t)
 
-	// Lev Tolstoi ID
-	authorID := "44a54d7b-6289-4b12-b030-1ffd884763cb"
+	authorID := "44a54d7b-6289-4b12-b030-1ffd884763cb" // Lev Tolstoi ID
 	expBookCount := 4
 
-	resp, err := client.BooksByAuthor(context.Background(), &proto.BooksByAuthorRequest{
+	resp, err := client.BooksByAuthorID(context.Background(), &proto.BooksByAuthorRequest{
 		AuthorId: authorID,
 	})
 	require.NoError(t, err)
@@ -37,10 +36,31 @@ func TestHandler_BooksByAuthor(t *testing.T) {
 	}
 }
 
+func TestHandler_AuthorsByBookID(t *testing.T) {
+	client := NewClient(t)
+
+	bookID := "f3abf142-715a-47a4-83da-4a681e24a278" // The Brothers Karamazov ID
+	expAuthorCount := 2
+
+	resp, err := client.AuthorsByBookID(context.Background(), &proto.AuthorsByBookRequest{
+		BookId: bookID,
+	})
+	require.NoError(t, err)
+
+	require.Len(t, resp.Authors, expAuthorCount) // check expected author count
+
+	for _, v := range resp.Authors {
+		require.NotEmpty(t, v.Id)        // check id is not empty
+		require.NotEmpty(t, v.FirstName) // check first name is not empty
+		require.NotEmpty(t, v.LastName)  // check last name is not empty
+	}
+}
+
+// Create new client
 func NewClient(t *testing.T) proto.LibraryClient {
 	t.Helper()
 
-	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 8080))
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", 8091))
 	require.NoError(t, err)
 
 	db := initDB(t)
@@ -54,7 +74,7 @@ func NewClient(t *testing.T) proto.LibraryClient {
 		require.NoError(t, err)
 	}()
 
-	conn, err := grpc.Dial("localhost:8080", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.Dial("localhost:8091", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 	t.Cleanup(func() {
 		err := conn.Close()
@@ -66,6 +86,7 @@ func NewClient(t *testing.T) proto.LibraryClient {
 	return client
 }
 
+// Connect to database
 func initDB(t *testing.T) *sql.DB {
 	t.Helper()
 
