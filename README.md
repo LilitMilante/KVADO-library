@@ -1,30 +1,36 @@
 ## Start the application with database:
+```shell
+make up-docker
+```
 
-`make up-docker`
+## Run tests:
+```shell
+make test
+```
 
 ## Install dependencies:
 
-```bash
+```shell
 make deps
 ```
 
 ## How to send requests
 
-### Get books by author ID:
+Get books by author ID:
 
-```bash
+```shell
 make sand-1
 ```
 
-### Get authors by book ID:
+Get authors by book ID:
 
-```bash
+```shell
 make send-2
 ```
 
-# You can use next data examples
+## You can use next data examples
 
-## Authors Table
+### Authors Table
 
 | id                                   | first_name | last_name   |
 |--------------------------------------|------------|-------------|
@@ -32,7 +38,7 @@ make send-2
 | 44a54d7b-6289-4b12-b030-1ffd884763cb | Лев        | Толстой     |
 | 37335b5a-fd7e-4fc3-9d67-7d981be01ba9 | Федор      | Достоевский |
 
-## Books Table
+### Books Table
 
 | id                                   | title                             |
 |--------------------------------------|-----------------------------------|
